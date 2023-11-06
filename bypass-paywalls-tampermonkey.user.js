@@ -182,7 +182,38 @@
 
 (function () {
     'use strict';
+   function removeDOMElement(...elements) {
+        for (const element of elements) {
+            if (element) { element.remove(); }
+        }
+    }
 
+    function removeClassesByPrefix(el, prefix) {
+        for (const clazz of el.classList) {
+            if (clazz.startsWith(prefix)) {
+                el.classList.remove(clazz);
+            }
+        }
+    }
+    // Prevent element from being added the first time to the DOM
+    function blockElement(selector, blockAlways = false) {
+        new window.MutationObserver(function (mutations) {
+            for (const mutation of mutations) {
+                for (const node of mutation.addedNodes) {
+                    if (node instanceof window.HTMLElement) {
+                        if (node.matches(selector)) {
+                            removeDOMElement(node);
+                            if (!blockAlways) {
+                                this.disconnect(); // Stop watching for element being added after one removal
+                            }
+                        }
+                    }
+                }
+            }
+        }).observe(document, { subtree: true, childList: true });
+    }
+
+    
     if (!matchDomain(['seekingalpha.com', 'sfchronicle.com', 'cen.acs.org', 'elmundo.es'])) {
         window.localStorage.clear();
     }
@@ -915,37 +946,8 @@
         });
     }
 
-    function removeDOMElement(...elements) {
-        for (const element of elements) {
-            if (element) { element.remove(); }
-        }
-    }
 
-    function removeClassesByPrefix(el, prefix) {
-        for (const clazz of el.classList) {
-            if (clazz.startsWith(prefix)) {
-                el.classList.remove(clazz);
-            }
-        }
-    }
 
-    // Prevent element from being added the first time to the DOM
-    function blockElement(selector, blockAlways = false) {
-        new window.MutationObserver(function (mutations) {
-            for (const mutation of mutations) {
-                for (const node of mutation.addedNodes) {
-                    if (node instanceof window.HTMLElement) {
-                        if (node.matches(selector)) {
-                            removeDOMElement(node);
-                            if (!blockAlways) {
-                                this.disconnect(); // Stop watching for element being added after one removal
-                            }
-                        }
-                    }
-                }
-            }
-        }).observe(document, { subtree: true, childList: true });
-    }
 
     function ampUnhideSubscriptionsSection(ampAdsSel = 'amp-ad, .ad') {
         const preview = document.querySelector('[subscriptions-section="content-not-granted"]');
