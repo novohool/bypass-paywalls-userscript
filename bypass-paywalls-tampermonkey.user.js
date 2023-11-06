@@ -393,6 +393,7 @@
         removeDOMElement(paywall);
     } else if (matchDomain('bloomberg.com')) {
         blockElement('#graphics-paywall-overlay', true);
+        blockElement('[role="alertdialog"]', true);
     } else if (matchDomain('bloombergquint.com')) {
         const articlesLeftModal = document.getElementsByClassName('paywall-meter-module__story-paywall-container__1UgCE')[0];
         const paywall = document.getElementById('paywallDmp');
